@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mahesh – A Retro Film</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    background: #e4d8ca;
+    color: #2a211d;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animated film grain */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.15;
+    pointer-events: none;
+    animation: grain 1s steps(2) infinite;
+}
+
+@keyframes grain {
+    0% { transform: translate(0,0); }
+    50% { transform: translate(-2%,2%); }
+    100% { transform: translate(0,0); }
+}
+
+/* Vignette */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    box-shadow: inset 0 0 150px rgba(0,0,0,0.35);
+    pointer-events: none;
+}
+
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.screen.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: reveal 1.2s ease forwards;
+}
+
+@keyframes reveal {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+p {
+    font-size: 20px;
+    max-width: 500px;
+    margin-bottom: 25px;
+}
+
+button {
+    padding: 12px 32px;
+    margin: 10px;
+    border-radius: 40px;
+    border: 1px solid #b08a57;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.4s ease;
+}
+
+button:hover {
+    background: #b08a57;
+    color: white;
+}
+
+/* Candle */
+.candle {
+    width: 20px;
+    height: 100px;
+    background: #f7f7f7;
+    border-radius: 6px;
+    position: relative;
+    margin: 30px;
+}
+
+.flame {
+    width: 18px;
+    height: 28px;
+    background: radial-gradient(circle, #ffd27f 0%, #ff9900 60%, transparent 70%);
+    border-radius: 50%;
+    position: absolute;
+    top: -30px;
+    left: 1px;
+    animation: flicker 0.15s infinite alternate;
+    box-shadow: 0 0 30px rgba(255, 170, 60, 0.8);
+}
+
+@keyframes flicker {
+    from { transform: scaleY(1); }
+    to { transform: scaleY(1.1); }
+}
+
+.smoke {
+    position: absolute;
+    top: -35px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    background: rgba(150,150,150,0.4);
+    border-radius: 50%;
+    animation: rise 3s ease forwards;
+}
+
+@keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 0.7; }
+    100% { transform: translateY(-80px) scale(2.5); opacity: 0; }
+}
+
+.fade-black {
+    background: black;
+    transition: 1.5s ease;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="your-music.mp3"></audio>
+
+<div class="screen active" id="welcome">
+    <h1>Mahesh</h1>
+    <p>A Film In Warm Tones</p>
+    <button onclick="nextScreen('music')">Begin</button>
+</div>
+
+<div class="screen" id="music">
+    <h1>The Soundtrack</h1>
+    <button onclick="playMusic()">Play</button>
+    <button onclick="nextScreen('candle')">Continue</button>
+</div>
+
+<div class="screen" id="candle">
+    <h1>Make A Wish</h1>
+    <div class="candle">
+        <div class="flame" id="flame"></div>
+    </div>
+    <button onclick="blowCandle()">Blow Candle</button>
+    <button onclick="nextScreen('final')" id="candleNext" style="display:none;">Continue</button>
+</div>
+
+<div class="screen" id="final">
+    <h1>Design Fades. Memories Don’t.</h1>
+    <button onclick="restart()">Replay</button>
+</div>
+
+<script>
+function nextScreen(id) {
+    let current = document.querySelector('.active');
+    current.classList.remove('active');
+
+    setTimeout(() => {
+        document.getElementById(id).classList.add('active');
+    }, 500);
+}
+
+let music = document.getElementById("bgMusic");
+
+function playMusic() {
+    music.volume = 0;
+    music.play();
+    let fade = setInterval(() => {
+        if (music.volume < 0.8) music.volume += 0.02;
+        else clearInterval(fade);
+    }, 120);
+}
+
+function blowCandle() {
+    let flame = document.getElementById("flame");
+    flame.style.transition = "1s ease";
+    flame.style.opacity = "0";
+
+    let smoke = document.createElement("div");
+    smoke.className = "smoke";
+    document.querySelector(".candle").appendChild(smoke);
+
+    setTimeout(() => {
+        document.getElementById("candleNext").style.display = "inline-block";
+    }, 1500);
+}
+
+function restart() {
+    document.body.classList.add("fade-black");
+    setTimeout(() => {
+        location.reload();
+    }, 1500);
+}
+</script>
+
+</body>
+</html>
